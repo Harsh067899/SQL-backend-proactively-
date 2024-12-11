@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Speaker Booking</title>
+</head>
+<body>
+  <h1>Speakers</h1>
+  
+  <!-- Display list of speakers -->
+  <div id="speaker-list"></div>
+  
+  <h2>Book a Session</h2>
+  <form id="booking-form">
+    <label for="speaker-id">Choose a speaker:</label>
+    <select id="speaker-id"></select>
+    
+    <label for="time-slot-id">Choose a time slot:</label>
+    <select id="time-slot-id"></select>
+    
+    <button type="submit">Book Session</button>
+  </form>
+
+  <script>
+    // Fetch and display speakers
+    fetch('http://localhost:3001/api/speakers')
+      .then(response => response.json())
+      .then(speakers => {
+        const speakerList = document.getElementById('speaker-list');
+        const speakerSelect = document.getElementById('speaker-id');
+        
+        speakers.forEach(speaker => {
+          const speakerElement = document.createElement('div');
+          speakerElement.textContent = `${speaker.first_name} ${speaker.last_name} - ${speaker.expertise}`;
+          speakerList.appendChild(speakerElement);
+          
+          const option = document.createElement('option');
+          option.value = speaker.id;
+          option.textContent = `${speaker.first_name} ${speaker.last_name}`;
+          speakerSelect.appendChild(option);
+        });
+      })
+      .catch(error => console.error('Error fetching speakers:', error));
+
+    // Fetch and display available time slots for selected speaker
+    document.getElementById('speaker-id').addEventListener('change', function() {
+      const speakerId = this.value;
+      const timeSlotSelect = document.getElementById('time-slot-id');
+      timeSlotSelect.innerHTML = ''; // Clear previous options
+
+      fetch(`http://localhost:3001/api/speakers/${speakerId}/time-slots`)
+        .then(response => response.json())
+        .then(slots => {
+          slots.forEach(slot => {
+            const option = document.createElement('option');
+            option.value = slot.id;
+            option.textContent = `${new Date(slot.start_time).toLocaleString()} - ${new Date(slot.end_time).toLocaleString()}`;
+            timeSlotSelect.appendChild(option);
+          });
+        })
+        .catch(error => console.error('Error fetching time slots:', error));
+    });
+
+    // Handle booking session form submission
+    document.getElementById('booking-form').addEventListener('submit', function(event) {
+      event.preventDefault();
+
+      const speakerId = document.getElementById('speaker-id').value;
+      const timeSlotId = document.getElementById('time-slot-id').value;
+
+      fetch('http://localhost:3001/api/appointments', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': JWT_SECRET
+        },
+        body: JSON.stringify({ speaker_id: speakerId, time_slot_id: timeSlotId })
+      })
+      .then(response => response.json())
+      .then(data => alert(data.message))
+      .catch(error => console.error('Error booking session:', error));
+    });
+  </script>
+</body>
+</html>

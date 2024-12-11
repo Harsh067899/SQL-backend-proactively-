@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Book a Session</title>
+</head>
+<body>
+    <h2>Available Time Slots</h2>
+    <div id="timeSlots"></div>
+    <button onclick="confirmBooking()">Confirm Booking</button>
+
+    <script>
+        const speakerId = new URLSearchParams(window.location.search).get('speakerId');
+
+        async function fetchTimeSlots() {
+            const response = await fetch(`http://localhost:3000/api/speakers/${speakerId}/time-slots`);
+            const data = await response.json();
+
+            const slotsDiv = document.getElementById('timeSlots');
+            if (data.length === 0) {
+                slotsDiv.innerHTML = '<p>No available time slots.</p>';
+                return;
+            }
+
+            data.forEach(slot => {
+                const div = document.createElement('div');
+                div.innerHTML = `
+                    <p>${new Date(slot.start_time).toLocaleString()} - ${new Date(slot.end_time).toLocaleString()}</p>
+                    <input type="radio" name="timeSlot" value="${slot.id}" /> Select
+                `;
+                slotsDiv.appendChild(div);
+            });
+        }
+
+        function confirmBooking() {
+            const timeSlotId = document.querySelector('input[name="timeSlot"]:checked')?.value;
+            if (!timeSlotId) {
+                alert('Please select a time slot');
+                return;
+            }
+
+            const token = localStorage.getItem('token');
+            fetch('http://localhost:3000/api/appointments', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({ speakerId, timeSlotId })
+            }).then(response => response.json())
+              .then(data => {
+                  alert(data.message);
+                  window.location.href = '/speakers.html';
+              }).catch(err => {
+                  console.error('Error booking appointment:', err);
+                  alert('Booking failed. Please try again later.');
+              });
+        }
+        function confirmBooking() {
+            const timeSlotId = document.querySelector('input[name="timeSlot"]:checked')?.value;
+            if (!timeSlotId) {
+                alert('Please select a time slot');
+                return;
+            }
+        
+            const token = localStorage.getItem('token');
+            fetch('http://localhost:3000/api/appointments', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({ speakerId, timeSlotId })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'already_booked') {
+                    alert('This time slot has already been booked. Please select another one.');
+                } else {
+                    alert(data.message);
+                    window.location.href = '/speakers.html'; // Redirect after booking
+                }
+            })
+            .catch(err => {
+                console.error('Error booking appointment:', err);
+                alert('Booking failed. Please try again later.');
+            });
+        }
+        
+
+        fetchTimeSlots();
+    </script>
+</body>
+</html>

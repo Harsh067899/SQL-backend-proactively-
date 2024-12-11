@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Session Booking App</title>
+  <script src="app.js" defer></script>
+</head>
+<body>
+  <h1>Session Booking App</h1>
+
+  <!-- Speaker Setup Section -->
+  <div id="speaker-setup-section">
+    <h2>Setup Speaker Profile</h2>
+    <form id="speaker-setup-form">
+      <input type="text" id="first-name" placeholder="First Name" required>
+      <input type="text" id="last-name" placeholder="Last Name" required>
+      <textarea id="bio" placeholder="Bio"></textarea>
+      <input type="text" id="expertise" placeholder="Expertise" required>
+      <input type="number" id="price" placeholder="Price per Session" required>
+      <button type="submit">Save Profile</button>
+    </form>
+  </div>
+
+  <!-- Speaker List Section -->
+  <div id="speaker-list-section">
+    <h2>Available Speakers</h2>
+    <div id="speakers-list"></div>
+  </div>
+
+  <!-- Time Slots Section -->
+  <div id="time-slot-section">
+    <h2>Book a Session</h2>
+    <div id="time-slots-list"></div>
+  </div>
+</body>
+</html>

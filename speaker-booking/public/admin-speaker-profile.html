@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Speaker Profile</title>
+</head>
+<body>
+    <h2>Create Speaker Profile</h2>
+    <form id="speakerProfileForm">
+        <label for="first_name">First Name:</label>
+        <input type="text" id="first_name" required /><br /><br />
+        <label for="last_name">Last Name:</label>
+        <input type="text" id="last_name" required /><br /><br />
+        <label for="bio">Bio:</label>
+        <textarea id="bio" required></textarea><br /><br />
+        <label for="expertise">Expertise:</label>
+        <input type="text" id="expertise" required /><br /><br />
+        <label for="price_per_session">Price per Session:</label>
+        <input type="number" id="price_per_session" required /><br /><br />
+        <button type="submit">Create Profile</button>
+    </form>
+
+    <script>
+        document.getElementById('speakerProfileForm').addEventListener('submit', async (event) => {
+            event.preventDefault();
+            
+            const token = localStorage.getItem('token');
+            const firstName = document.getElementById('first_name').value;
+            const lastName = document.getElementById('last_name').value;
+            const bio = document.getElementById('bio').value;
+            const expertise = document.getElementById('expertise').value;
+            const pricePerSession = document.getElementById('price_per_session').value;
+
+            const response = await fetch('http://localhost:3001/api/speakers', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({
+                    first_name: firstName,
+                    last_name: lastName,
+                    bio: bio,
+                    expertise: expertise,
+                    price_per_session: pricePerSession
+                }),
+            });
+
+            const data = await response.json();
+            alert(data.message);
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Time Slot</title>
+</head>
+<body>
+    <h2>Add Available Time Slot</h2>
+
+    <form id="timeSlotForm">
+        <label for="start_time">Start Time:</label>
+        <input type="datetime-local" id="start_time" name="start_time" required><br><br>
+
+        <label for="end_time">End Time:</label>
+        <input type="datetime-local" id="end_time" name="end_time" required><br><br>
+
+        <button type="submit">Submit</button>
+    </form>
+
+    <script>
+        const speakerId = new URLSearchParams(window.location.search).get('speakerId');
+        const form = document.getElementById('timeSlotForm');
+
+        form.addEventListener('submit', async (event) => {
+            event.preventDefault();
+
+            const startTime = document.getElementById('start_time').value;
+            const endTime = document.getElementById('end_time').value;
+
+            const timeSlotData = {
+                start_time: startTime,
+                end_time: endTime
+            };
+
+            try {
+                const response = await fetch(`http://localhost:3000/api/speakers/${speakerId}/time-slots`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(timeSlotData)
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    alert('Time slot added successfully!');
+                    window.location.href = `/speakers.html`; // Redirect back to the speaker list
+                } else {
+                    alert('Error adding time slot: ' + data.error);
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Failed to add time slot');
+            }
+        });
+    </script>
+</body>
+</html>
